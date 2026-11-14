@@ -1,0 +1,5 @@
+.env*
+.next-*
+work/
+outputs/
+tsconfig.tsbuildinfo
