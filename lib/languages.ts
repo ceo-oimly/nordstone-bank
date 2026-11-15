@@ -1,4 +1,38 @@
-export const languageOptions = [
+export type LanguageCode =
+  | "en"
+  | "ko"
+  | "ar-ae"
+  | "ar"
+  | "es"
+  | "fr"
+  | "de"
+  | "pt"
+  | "it"
+  | "ja"
+  | "zh"
+  | "zh-tw"
+  | "ru"
+  | "hi"
+  | "tr"
+  | "nl"
+  | "id"
+  | "vi"
+  | "th"
+  | "pl"
+  | "sv"
+  | "el";
+
+export type LanguageOption = {
+  code: LanguageCode;
+  locale: string;
+  name: string;
+  nativeName: string;
+  region: string;
+  flag: string;
+  direction: "ltr" | "rtl";
+};
+
+export const languageOptions: readonly LanguageOption[] = [
   { code: "en", locale: "en-US", name: "English", nativeName: "English", region: "Global / United States", flag: "🇺🇸", direction: "ltr" },
   { code: "ko", locale: "ko-KR", name: "Korean", nativeName: "한국어", region: "South Korea", flag: "🇰🇷", direction: "ltr" },
   { code: "ar-ae", locale: "ar-AE", name: "Arabic (Dubai / UAE)", nativeName: "العربية (دبي / الإمارات)", region: "Dubai / UAE", flag: "🇦🇪", direction: "rtl" },
@@ -21,9 +55,7 @@ export const languageOptions = [
   { code: "pl", locale: "pl-PL", name: "Polish", nativeName: "Polski", region: "Poland", flag: "🇵🇱", direction: "ltr" },
   { code: "sv", locale: "sv-SE", name: "Swedish", nativeName: "Svenska", region: "Sweden", flag: "🇸🇪", direction: "ltr" },
   { code: "el", locale: "el-GR", name: "Greek", nativeName: "Ελληνικά", region: "Greece", flag: "🇬🇷", direction: "ltr" },
-] as const;
-
-export type LanguageCode = (typeof languageOptions)[number]["code"];
+];
 
 export const translations: Record<LanguageCode, Record<string, string>> = {
   en: {},

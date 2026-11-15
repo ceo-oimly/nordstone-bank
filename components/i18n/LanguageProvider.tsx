@@ -2,6 +2,7 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { appTranslations, languageOptions, LanguageCode, translations } from "@/lib/languages";
+import LanguageModal from "@/components/i18n/LanguageModal";
 
 type LanguageContextValue = {
   language: LanguageCode;
@@ -95,7 +96,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     closeModal,
   }), [language, selected.locale, selected.direction, setLanguage, isModalOpen, openModal, closeModal]);
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+      <LanguageModal />
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {
