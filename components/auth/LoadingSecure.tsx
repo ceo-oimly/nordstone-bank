@@ -1,9 +1,12 @@
 "use client";
+import LoadingRings from "@/components/brand/LoadingRings";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 export default function LoadingSecure() {
+  const { t } = useLanguage();
   return <div className="secure-loading" role="status" aria-live="polite">
-    <div className="secure-logo"><span>Y</span><i/></div>
+    <LoadingRings />
     <div className="secure-progress"><i/></div>
-    <p>Loading secure environment...</p>
+    <p>{t("Loading secure environment...")}</p>
   </div>;
 }

@@ -2,6 +2,8 @@
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import BankBrand from "@/components/brand/BankBrand";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type AccountType = "Checking" | "Savings" | "Business" | "Student";
 type Draft = { step: number; firstName: string; middleName: string; lastName: string; username: string; email: string; phone: string; country: string; accountType: AccountType | "" };
@@ -34,6 +36,7 @@ function CircleIcon({ type }: { type: "person" | "mail" | "bank" | "shield" }) {
 }
 
 export default function RegisterWizard() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [form, setForm] = useState<FormState>({ step: 1, firstName: "", middleName: "", lastName: "", username: "", email: "", phone: "", country: "United States of America", accountType: "", pin: "", password: "", confirmPassword: "", agreeToTerms: false });
   const [hydrated, setHydrated] = useState(false);
@@ -183,71 +186,73 @@ export default function RegisterWizard() {
   ];
 
   return <main className="register-page">
-    <a href="/" className="auth-wordmark"><b>NORDSTONE</b><span>BANK</span></a>
+    <BankBrand href="/" className="auth-wordmark" />
     <section className="register-card">
-      <div className="register-card-heading"><h1>Create Your Account</h1><span>Step {form.step} of 4</span></div>
-      <div className="register-progress" aria-label={`Step ${form.step} of 4`}><i style={{ width: `${form.step * 25}%` }}/></div>
-      <div className="register-step-labels">{["Personal Info", "Contact Details", "Account Setup", "Security"].map((label, index) => <span key={label} className={index + 1 <= form.step ? "current" : ""}>{label}</span>)}</div>
+      <div className="register-card-heading"><h1>{t("Create Your Account")}</h1><span>{t("Step")} {new Intl.NumberFormat().format(form.step)} {t("of")} 4</span></div>
+      <div className="register-progress" aria-label={`${t("Step")} ${form.step} ${t("of")} 4`}><i style={{ width: `${form.step * 25}%` }}/></div>
+      <div className="register-step-labels">{["Personal Info", "Contact Details", "Account Setup", "Security"].map((label, index) => <span key={label} className={index + 1 <= form.step ? "current" : ""}>{t(label)}</span>)}</div>
 
-      {success ? <div className="register-success"><span>✓</span><h2>Account created successfully!</h2><p>Your account number is</p><strong>{accountNumber}</strong><small>Taking you to PIN verification...</small></div> : <form onSubmit={form.step === 4 ? createAccount : (event) => { event.preventDefault(); nextStep(); }} noValidate>
+      {success ? <div className="register-success"><span>✓</span><h2>{t("Account created successfully!")}</h2><p>{t("Your account number is")}</p><strong>{accountNumber}</strong><small>{t("Taking you to PIN verification...")}</small></div> : <form onSubmit={form.step === 4 ? createAccount : (event) => { event.preventDefault(); nextStep(); }} noValidate>
         {form.step === 1 && <>
-          <CircleIcon type="person"/><h2 className="register-step-title">Personal Information</h2><p className="register-step-subtitle">Please provide your legal name as it appears on official documents</p>
+          <CircleIcon type="person"/><h2 className="register-step-title">{t("Personal Information")}</h2><p className="register-step-subtitle">{t("Please provide your legal name as it appears on official documents")}</p>
           <div className="register-fields two-cols">
-            <Field label="Legal First Name *" error={errors.firstName}><input autoComplete="given-name" placeholder="John" value={form.firstName} onChange={(e) => update("firstName", e.target.value)}/></Field>
-            <Field label="Middle Name" hint="Optional"><input autoComplete="additional-name" placeholder="David" value={form.middleName} onChange={(e) => update("middleName", e.target.value)}/></Field>
-            <Field label="Legal Last Name *" error={errors.lastName}><input autoComplete="family-name" placeholder="Smith" value={form.lastName} onChange={(e) => update("lastName", e.target.value)}/></Field>
-            <Field label="Username *" error={errors.username} status={usernameAvailability}><input autoComplete="username" placeholder="johnsmith123" value={form.username} onChange={(e) => update("username", e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}/></Field>
+            <Field label={t("Legal First Name *")} error={errors.firstName}><input autoComplete="given-name" placeholder={t("John")} value={form.firstName} onChange={(e) => update("firstName", e.target.value)}/></Field>
+            <Field label={t("Middle Name")} hint={t("Optional")}><input autoComplete="additional-name" placeholder={t("David")} value={form.middleName} onChange={(e) => update("middleName", e.target.value)}/></Field>
+            <Field label={t("Legal Last Name *")} error={errors.lastName}><input autoComplete="family-name" placeholder={t("Smith")} value={form.lastName} onChange={(e) => update("lastName", e.target.value)}/></Field>
+            <Field label={t("Username *")} error={errors.username} status={usernameAvailability}><input autoComplete="username" placeholder={t("johnsmith123")} value={form.username} onChange={(e) => update("username", e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}/></Field>
           </div>
         </>}
 
         {form.step === 2 && <>
-          <CircleIcon type="mail"/><h2 className="register-step-title">Contact Information</h2><p className="register-step-subtitle">We’ll use these details to communicate with you about your account</p>
+          <CircleIcon type="mail"/><h2 className="register-step-title">{t("Contact Information")}</h2><p className="register-step-subtitle">{t("We’ll use these details to communicate with you about your account")}</p>
           <div className="register-fields">
-            <Field label="Email Address *" error={errors.email} status={emailAvailability} icon="✉"><input type="email" autoComplete="email" placeholder="john.smith@example.com" value={form.email} onChange={(e) => update("email", e.target.value)}/></Field>
-            <Field label="Phone Number *" error={errors.phone} icon="☎"><input type="tel" autoComplete="tel" placeholder="+12345678901" value={form.phone} onChange={(e) => update("phone", e.target.value)}/></Field>
-            <Field label="Country *" error={errors.country} icon="◎">
-              <div className="country-picker"><input role="combobox" aria-expanded={countryOpen} aria-controls="country-options" autoComplete="country-name" placeholder="Search countries" value={countrySearch} onFocus={() => { setCountrySearch(""); setCountryOpen(true); }} onBlur={() => window.setTimeout(() => { setCountryOpen(false); setCountrySearch(form.country); }, 150)} onChange={handleCountry}/><span>⌄</span>{countryOpen && <div className="country-options" id="country-options" role="listbox">{filteredCountries.length ? filteredCountries.map((country) => <button type="button" role="option" aria-selected={form.country === country} key={country} onMouseDown={(e) => e.preventDefault()} onClick={() => { update("country", country); setCountrySearch(country); setCountryOpen(false); }}>{country}</button>) : <div className="country-empty">No matching countries</div>}</div>}</div>
+            <Field label={`${t("Email Address")} *`} error={errors.email} status={emailAvailability} icon="✉"><input type="email" autoComplete="email" placeholder="john.smith@example.com" value={form.email} onChange={(e) => update("email", e.target.value)}/></Field>
+            <Field label={`${t("Phone Number")} *`} error={errors.phone} icon="☎"><input type="tel" autoComplete="tel" placeholder="+12345678901" value={form.phone} onChange={(e) => update("phone", e.target.value)}/></Field>
+            <Field label={`${t("Country")} *`} error={errors.country} icon="◎">
+              <div className="country-picker"><input role="combobox" aria-expanded={countryOpen} aria-controls="country-options" autoComplete="country-name" placeholder={t("Search countries")} value={countrySearch} onFocus={() => { setCountrySearch(""); setCountryOpen(true); }} onBlur={() => window.setTimeout(() => { setCountryOpen(false); setCountrySearch(form.country); }, 150)} onChange={handleCountry}/><span>⌄</span>{countryOpen && <div className="country-options" id="country-options" role="listbox">{filteredCountries.length ? filteredCountries.map((country) => <button type="button" role="option" aria-selected={form.country === country} key={country} onMouseDown={(e) => e.preventDefault()} onClick={() => { update("country", country); setCountrySearch(country); setCountryOpen(false); }}>{t(country)}</button>) : <div className="country-empty">{t("No matching countries")}</div>}</div>}</div>
             </Field>
           </div>
         </>}
 
         {form.step === 3 && <>
-          <CircleIcon type="bank"/><h2 className="register-step-title">Account Setup</h2><p className="register-step-subtitle">Choose your account type and set up your transaction PIN</p>
+          <CircleIcon type="bank"/><h2 className="register-step-title">{t("Account Setup")}</h2><p className="register-step-subtitle">{t("Choose your account type and set up your transaction PIN")}</p>
           <div className="account-choice-grid">{accountOptions.slice(0, 2).map((option) => <AccountChoice key={option.type} option={option} selected={form.accountType === option.type} onSelect={() => update("accountType", option.type)} />)}</div>
-          <button type="button" className="show-account-types" onClick={(e) => { const grid = document.getElementById("additional-account-types"); if (grid) grid.hidden = !grid.hidden; e.currentTarget.setAttribute("aria-expanded", grid?.hidden ? "false" : "true"); }}>Show more account types <span>⌄</span></button>
+          <button type="button" className="show-account-types" onClick={(e) => { const grid = document.getElementById("additional-account-types"); if (grid) grid.hidden = !grid.hidden; e.currentTarget.setAttribute("aria-expanded", grid?.hidden ? "false" : "true"); }}>{t("Show more account types")} <span>⌄</span></button>
           <div id="additional-account-types" className="account-choice-grid additional-account-types" hidden>{accountOptions.slice(2).map((option) => <AccountChoice key={option.type} option={option} selected={form.accountType === option.type} onSelect={() => update("accountType", option.type)} />)}</div>
           {errors.accountType && <small className="reg-field-error">{errors.accountType}</small>}
           <Field label="Transaction PIN (4 digits) *" error={errors.pin} icon="⌑"><input type={showPin ? "text" : "password"} inputMode="numeric" pattern="[0-9]*" autoComplete="off" maxLength={4} placeholder="••••" value={form.pin} onChange={(e) => update("pin", e.target.value.replace(/\D/g, "").slice(0, 4))}/><button type="button" className="reg-eye" onClick={() => setShowPin(!showPin)} aria-label={showPin ? "Hide PIN" : "Show PIN"}>{showPin ? "◉" : "◎"}</button></Field>
-          <p className="reg-helper">Your PIN will be required to authorize transactions.</p>
+          <p className="reg-helper">{t("Your PIN will be required to authorize transactions.")}</p>
         </>}
 
         {form.step === 4 && <>
-          <CircleIcon type="shield"/><h2 className="register-step-title">Secure Your Account</h2><p className="register-step-subtitle">Create a strong password to protect your account</p>
+          <CircleIcon type="shield"/><h2 className="register-step-title">{t("Secure Your Account")}</h2><p className="register-step-subtitle">{t("Create a strong password to protect your account")}</p>
           <div className="register-fields">
             <Field label="Password *" error={errors.password} icon="♙"><input type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Create a password" value={form.password} onChange={(e) => update("password", e.target.value)}/><button type="button" className="reg-eye" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "◉" : "◎"}</button></Field>
-            <div className="password-strength"><div className={`strength-meter strength-${strengthScore}`}><i/><i/><i/></div><span className={`strength-text strength-label-${strengthScore}`}>{form.password ? strengthText : "Password strength"}</span></div>
-            <div className="password-checklist"><span className={requirements.length ? "met" : ""}><b>{requirements.length ? "✓" : "○"}</b>8+ characters</span><span className={requirements.uppercase ? "met" : ""}><b>{requirements.uppercase ? "✓" : "○"}</b>One uppercase letter</span><span className={requirements.number ? "met" : ""}><b>{requirements.number ? "✓" : "○"}</b>One number</span></div>
+          <div className="password-strength"><div className={`strength-meter strength-${strengthScore}`}><i/><i/><i/></div><span className={`strength-text strength-label-${strengthScore}`}>{form.password ? t(strengthText) : t("Password strength")}</span></div>
+            <div className="password-checklist"><span className={requirements.length ? "met" : ""}><b>{requirements.length ? "✓" : "○"}</b>{t("8+ characters")}</span><span className={requirements.uppercase ? "met" : ""}><b>{requirements.uppercase ? "✓" : "○"}</b>{t("One uppercase letter")}</span><span className={requirements.number ? "met" : ""}><b>{requirements.number ? "✓" : "○"}</b>{t("One number")}</span></div>
             <Field label="Confirm Password *" error={errors.confirmPassword} icon="♙"><input type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="Re-enter your password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)}/><button type="button" className="reg-eye" onClick={() => setShowConfirmPassword(!showConfirmPassword)} aria-label={showConfirmPassword ? "Hide password" : "Show password"}>{showConfirmPassword ? "◉" : "◎"}</button></Field>
           </div>
-          <label className="reg-terms"><input type="checkbox" checked={form.agreeToTerms} onChange={(e) => update("agreeToTerms", e.target.checked)}/><span>I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span></label>
+          <label className="reg-terms"><input type="checkbox" checked={form.agreeToTerms} onChange={(e) => update("agreeToTerms", e.target.checked)}/><span>{t("I agree to the")} <a href="/terms" target="_blank">{t("Terms of Service")}</a> {t("and")} <a href="/privacy" target="_blank">{t("Privacy Policy")}</a>.</span></label>
           {errors.agreeToTerms && <small className="reg-field-error">{errors.agreeToTerms}</small>}
         </>}
 
         {formError && <div className="register-form-error" role="alert">{formError}</div>}
         <div className={`register-actions ${form.step === 1 ? "first-step" : ""}`}>
-          {form.step > 1 && <button type="button" className="reg-previous" onClick={previousStep}>‹ <span>Previous</span></button>}
-          {form.step < 4 ? <button type="submit" className="reg-next">Next <b>›</b></button> : <button type="submit" className="reg-next create-account" disabled={submitting || !form.agreeToTerms}>{submitting ? <><i className="button-spinner"/> Creating your account...</> : <>✓ <span>Create Account</span></>}</button>}
+          {form.step > 1 && <button type="button" className="reg-previous" onClick={previousStep}>‹ <span>{t("Previous")}</span></button>}
+          {form.step < 4 ? <button type="submit" className="reg-next">{t("Next")} <b>›</b></button> : <button type="submit" className="reg-next create-account" disabled={submitting || !form.agreeToTerms}>{submitting ? <><i className="button-spinner"/> {t("Creating your account...")}</> : <>✓ <span>{t("Create Account")}</span></>}</button>}
         </div>
       </form>}
     </section>
-    <p className="register-signin">Already have an account? <a href="/login">Sign in instead</a></p>
+    <p className="register-signin">{t("Already have an account?")} <a href="/login">{t("Sign in instead")}</a></p>
   </main>;
 }
 
 function Field({ label, error, hint, icon, status, children }: { label: string; error?: string; hint?: string; icon?: string; status?: Availability; children: React.ReactNode }) {
-  return <label className="reg-field"><span className="reg-label-row"><span>{label}</span>{hint && <small>{hint}</small>}</span><span className={`reg-control ${error ? "invalid" : ""} ${icon ? "with-icon" : ""}`}>{icon && <i aria-hidden="true">{icon}</i>}{children}{status === "checking" && <em className="availability checking">…</em>}{status === "available" && <em className="availability available">✓</em>}{status === "taken" && <em className="availability taken">×</em>}</span>{error && <small className="reg-field-error">{error}</small>}</label>;
+  const { t } = useLanguage();
+  return <label className="reg-field"><span className="reg-label-row"><span>{label}</span>{hint && <small>{hint}</small>}</span><span className={`reg-control ${error ? "invalid" : ""} ${icon ? "with-icon" : ""}`}>{icon && <i aria-hidden="true">{icon}</i>}{children}{status === "checking" && <em className="availability checking">…</em>}{status === "available" && <em className="availability available">✓</em>}{status === "taken" && <em className="availability taken">×</em>}</span>{error && <small className="reg-field-error">{t(error)}</small>}</label>;
 }
 
 function AccountChoice({ option, selected, onSelect }: { option: { type: AccountType; title: string; desc: string; icon: string }; selected: boolean; onSelect: () => void }) {
-  return <button type="button" className={`account-choice ${selected ? "selected" : ""}`} onClick={onSelect} aria-pressed={selected}><span className="account-choice-icon">{option.icon}</span><span className="account-choice-copy"><strong>{option.title}</strong><small>{option.desc}</small></span>{selected && <span className="account-choice-check">✓</span>}</button>;
+  const { t } = useLanguage();
+  return <button type="button" className={`account-choice ${selected ? "selected" : ""}`} onClick={onSelect} aria-pressed={selected}><span className="account-choice-icon">{option.icon}</span><span className="account-choice-copy"><strong>{t(option.title)}</strong><small>{t(option.desc)}</small></span>{selected && <span className="account-choice-check">✓</span>}</button>;
 }

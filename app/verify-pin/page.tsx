@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import BankBrand from "@/components/brand/BankBrand";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type Profile = { firstName: string; lastName: string; initials: string };
 
 export default function VerifyPinPage() {
+  const { t, locale } = useLanguage();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pin, setPin] = useState("");
@@ -87,27 +90,27 @@ export default function VerifyPinPage() {
     <section className="pin-card">
       <header className="pin-header">
         <div className="pin-header-orb orb-one"/><div className="pin-header-orb orb-two"/><div className="pin-header-orb orb-three"/>
-        <a href="/" className="pin-wordmark"><b>NORDSTONE</b><span>BANK</span></a>
+        <BankBrand href="/" className="pin-wordmark" />
         <div className="fingerprint-icon" aria-hidden="true">◎</div>
-        <h1>Verify Your Identity</h1>
-        <p>Please enter your secure 4-digit PIN to continue</p>
+        <h1>{t("Verify Your Identity")}</h1>
+        <p>{t("Please enter your secure 4-digit PIN to continue")}</p>
       </header>
 
       <div className="pin-content">
-        <div className="pin-user"><div className="pin-avatar">{profile?.initials || "··"}<span>✓</span></div><div><strong>{profile ? `${profile.firstName} ${profile.lastName}` : "Loading your profile..."}</strong><small>Secure account verification</small></div></div>
+        <div className="pin-user"><div className="pin-avatar">{profile?.initials || "··"}<span>✓</span></div><div><strong>{profile ? `${profile.firstName} ${profile.lastName}` : t("Loading your profile...")}</strong><small>{t("Secure account verification")}</small></div></div>
         <div className={`pin-dots ${shake ? "pin-shake" : ""}`} aria-label={`${pin.length} of 4 PIN digits entered`}>{[0, 1, 2, 3].map((index) => <span key={index} className={index < pin.length ? "filled" : ""}/>)}</div>
-        <p className="pin-helper">Enter the 4-digit PIN you created during registration</p>
-        {error && <div className={`pin-error ${locked ? "locked-message" : ""}`} role="alert">{locked ? `Too many attempts. Try again in ${remainingMinutes} minutes.` : error}</div>}
-        <div className="pin-keypad" aria-label="PIN keypad">
+        <p className="pin-helper">{t("Enter the 4-digit PIN you created during registration")}</p>
+        {error && <div className={`pin-error ${locked ? "locked-message" : ""}`} role="alert">{locked ? `${t("Too many attempts. Try again in")} ${new Intl.NumberFormat(locale).format(remainingMinutes)} ${t("minutes")}.` : t(error)}</div>}
+        <div className="pin-keypad" aria-label={t("PIN keypad")}>
           {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => <button type="button" key={digit} disabled={locked || busy || !profile} onClick={() => appendDigit(digit)}>{digit}</button>)}
-          <button type="button" aria-label="Reset PIN" disabled={locked || busy} onClick={resetPin}>↻</button>
+          <button type="button" aria-label={t("Reset PIN")} disabled={locked || busy} onClick={resetPin}>↻</button>
           <button type="button" disabled={locked || busy || !profile} onClick={() => appendDigit("0")}>0</button>
-          <button type="button" aria-label="Delete last digit" disabled={locked || busy} onClick={removeDigit}>⌫</button>
+          <button type="button" aria-label={t("Delete last digit")} disabled={locked || busy} onClick={removeDigit}>⌫</button>
         </div>
-        <button type="button" className="pin-submit" disabled={pin.length !== 4 || locked || busy} onClick={() => void verify()}>{busy ? "Verifying..." : "Verify PIN"} <b>→</b></button>
-        <div className="pin-security"><span>♙</span><p>Your security is our priority. PIN verification protects your account from unauthorized access.</p></div>
+        <button type="button" className="pin-submit" disabled={pin.length !== 4 || locked || busy} onClick={() => void verify()}>{busy ? t("Verifying...") : t("Verify PIN")} <b>→</b></button>
+        <div className="pin-security"><span>♙</span><p>{t("Your security is our priority. PIN verification protects your account from unauthorized access.")}</p></div>
       </div>
     </section>
-    <footer className="pin-footer"><span>© {new Date().getFullYear()} NORDSTONE BANK. All rights reserved.</span><nav><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/support">Contact Support</a></nav></footer>
+    <footer className="pin-footer"><span>© {new Date().toLocaleDateString(locale, { year: "numeric" })} NORDSTONE BANK. {t("All rights reserved.")}</span><nav><a href="/privacy">{t("Privacy Policy")}</a><a href="/terms">{t("Terms of Service")}</a><a href="/support">{t("Contact Support")}</a></nav></footer>
   </main>;
 }
