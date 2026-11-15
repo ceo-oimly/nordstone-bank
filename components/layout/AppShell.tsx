@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import NotificationBell from "@/components/layout/NotificationBell";
 import BankBrand from "@/components/brand/BankBrand";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
 const navItems = [
   { label: "Home", href: "/dashboard", icon: "⌂" },
@@ -32,6 +33,7 @@ export default function AppShell({ children, unreadCount = 0 }: { children: Reac
         <button type="button" className="app-icon-button hamburger-button" aria-label={t("Open navigation menu")} aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><span>☰</span></button>
         <BankBrand href="/dashboard" className="app-wordmark" />
         <div className="app-top-actions">
+          <LanguageSwitcher variant="header" />
           <NotificationBell unreadCount={unreadCount}/>
           <a className="app-icon-button help-button" href="/support" aria-label={t("Help")}>?</a>
         </div>

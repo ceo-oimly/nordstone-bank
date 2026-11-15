@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 export type TransferType = "local" | "international";
 export type TransferCurrency = { code: string; name: string; flagEmoji: string };
@@ -20,6 +21,7 @@ function formatMoney(amount: string | number, currency = "USD") {
 
 export default function TransferForm({ transferType, currencies }: { transferType: TransferType; currencies: TransferCurrency[] }) {
   const router = useRouter();
+  const { t } = useLanguage();
   const international = transferType === "international";
   const [balanceInfo, setBalanceInfo] = useState<BalanceInfo | null>(null);
   const [balanceError, setBalanceError] = useState("");
@@ -47,7 +49,7 @@ export default function TransferForm({ transferType, currencies }: { transferTyp
   const balance = Number(balanceInfo?.balance ?? 0);
   const currencyChoices = useMemo(() => currencies.filter((item) => ["USD", "EUR", "GBP"].includes(item.code)), [currencies]);
   const countryChoices = useMemo(() => currencies.map((item) => ({ ...item, countryName: countryByCurrency[item.code] || item.name })), [currencies]);
-  const title = international ? "International Wire Transfer" : "Local Bank Transfer";
+  const title = international ? t("International Transfer") : t("Local Transfer");
   const subtitle = international ? "Send money to any bank worldwide securely" : "Send money to any local bank account securely";
 
   useEffect(() => {

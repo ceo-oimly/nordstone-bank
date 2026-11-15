@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import BankBrand from "@/components/brand/BankBrand";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
 type Currency = { code: string; name: string; flagEmoji: string };
 type Rate = Currency & { rate: number; change24h: number; lastUpdated: Date };
@@ -16,7 +17,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const links = [["Home", "#home"], ["About", "#about"], ["Services", "#services"], ["Blog", "#blog"], ["Contact", "#contact"], ["Login", "/login"], ["Register", "/register"]];
-  return <header className="header"><div className="container header-inner"><BankBrand href="#home" className="wordmark"/><div className="header-actions"><a href="/login" aria-label={t("Login")} className="account">♙</a><button className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Toggle menu"><span>{open ? "×" : "☰"}</span></button></div></div>{open && <nav className="menu-panel">{links.map(([label, href]) => <a key={label} href={href} onClick={() => setOpen(false)}>{t(label)}</a>)}</nav>}</header>;
+  return <header className="header"><div className="container header-inner"><BankBrand href="#home" className="wordmark"/><div className="header-actions"><LanguageSwitcher variant="header" /><a href="/login" aria-label={t("Login")} className="account">♙</a><button className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Toggle menu"><span>{open ? "×" : "☰"}</span></button></div></div>{open && <nav className="menu-panel">{links.map(([label, href]) => <a key={label} href={href} onClick={() => setOpen(false)}>{t(label)}</a>)}</nav>}</header>;
 }
 
 export function Hero({ activeUsers }: { activeUsers?: string }) {
