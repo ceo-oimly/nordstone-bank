@@ -200,6 +200,9 @@ export const supportMessages = pgTable("support_messages", {
   senderType: varchar("sender_type", { length: 20 }).notNull(),
   senderId: uuid("sender_id").notNull(),
   message: text("message").notNull(),
+  sentViaEmail: boolean("sent_via_email").default(false).notNull(),
+  emailMessageId: varchar("email_message_id", { length: 255 }),
+  source: varchar("source", { length: 20 }).default("app").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

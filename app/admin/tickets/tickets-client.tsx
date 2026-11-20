@@ -1,0 +1,4 @@
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+export default function AdminTicketsClient(){const [tickets,setTickets]=useState<any[]>([]);const [error,setError]=useState("");useEffect(()=>{fetch("/api/admin/tickets",{cache:"no-store"}).then(async r=>{const b=await r.json();if(!r.ok)throw new Error(b.error);setTickets(b.tickets)}).catch(e=>setError(e.message))},[]);return <main className="support-page"><h1>Support Chats</h1>{error&&<p role="alert">{error}</p>}<div className="support-ticket-list">{tickets.map(t=><Link key={t.id} href={`/admin/tickets/${t.id}`} className="support-ticket-row"><strong>{t.ticketNumber}</strong><span>{t.userName}</span><span>{t.email}</span><span>{t.title}</span><span>{t.lastMessage}</span><time>{new Date(t.lastMessageAt).toLocaleString()}</time></Link>)}</div></main>}
